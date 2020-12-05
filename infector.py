@@ -52,7 +52,7 @@ class Infector:
         person._infected_on = day
         person.symptomatic = marcov_binary(self.config.symptomatic_dist().sample())
         
-        symptoms_start = self.config.days_to_symptoms_dist().sample()  # no symptoms is asymptomatic, but still used later
+        symptoms_start = person._infected_on + self.config.days_to_symptoms_dist().sample()  # no symptoms is asymptomatic, but still used later
         contagious_offset = self.config.contagious_offset_rel_symptoms(person.symptomatic).sample()
         contagious_start = symptoms_start + contagious_offset
         if contagious_start <= day:
@@ -61,6 +61,7 @@ class Infector:
         person.contagious_from_inc = contagious_start
         person.contagious_duration = self.config.contagious_duration_dist(person.symptomatic).sample()
         person.contagious_to_inc = person.contagious_from_inc + person.contagious_duration - 1
+        
         if person.symptomatic:
             person.symptoms_start = symptoms_start
             person.warn_potential_infection_on(person.symptoms_start + 1)
