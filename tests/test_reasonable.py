@@ -86,13 +86,12 @@ def reported_symptoms_before(people, day):
 
 #%%
 outputs = []
-katie_base_prb = 0.1
 h_see_r = 50
 h_see_s = 56
 num_sims = 10**5
 for i in range(num_sims):
     out = single_sim(h_see_s = h_see_s, h_see_r = h_see_r)
-    print(100 * i / num_sims, [x._infected_on for x in out])
+    print(100 * i / num_sims, [x.infected_on for x in out])
     outputs.append(out)
 
 print(f"Reasonable rates")

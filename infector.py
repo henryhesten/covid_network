@@ -49,10 +49,10 @@ class Infector:
     
     def infect(self, person: Person, day: int, cause: str) -> None:
         person.infected_by = cause
-        person._infected_on = day
+        person.infected_on = day
         person.symptomatic = marcov_binary(self.config.symptomatic_dist().sample())
         
-        symptoms_start = person._infected_on + self.config.days_to_symptoms_dist().sample()  # no symptoms is asymptomatic, but still used later
+        symptoms_start = person.infected_on + self.config.days_to_symptoms_dist().sample()  # no symptoms is asymptomatic, but still used later
         contagious_offset = self.config.contagious_offset_rel_symptoms(person.symptomatic).sample()
         contagious_start = symptoms_start + contagious_offset
         if contagious_start <= day:
@@ -64,4 +64,4 @@ class Infector:
         
         if person.symptomatic:
             person.symptoms_start = symptoms_start
-            person.warn_potential_infection_on(person.symptoms_start + 1)
+            person.warn_potential_infection_on(person.symptoms_start - self.config.warn_interactions_days_before_symptoms, person.symptoms_start)

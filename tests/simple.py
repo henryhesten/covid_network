@@ -28,18 +28,18 @@ config = Config()
 
 
 def single_interation():
-    harold: Person = Person("harold", DistributionBeta(True, 0.9, 1e-6))
+    harold: Person = Person("harold", DistributionBeta(True, 0.05, 1e-6))
     sophie: Person = Person("sophie", DistributionBeta(True, 0.001, 0.005))
     
-    SHOPPING_INC = 3
-    for d in range(100):
-        event = Event(
-                DistributionDiscrete(True, np.arange(SHOPPING_INC) + d * SHOPPING_INC, [1 / SHOPPING_INC] * SHOPPING_INC),
-                0,
-                f"shopping {d}",
-                config = config
-        )
-        harold.single_events.append(event)
+    # SHOPPING_INC = 3
+    # for d in range(100):
+    #     event = Event(
+    #             DistributionDiscrete(True, np.arange(SHOPPING_INC) + d * SHOPPING_INC, [1 / SHOPPING_INC] * SHOPPING_INC),
+    #             0,
+    #             f"shopping {d}",
+    #             config = config
+    #     )
+    #     harold.single_events.append(event)
     
     for d in range(300):
         Interaction(day = const_distribution(d),
@@ -60,10 +60,10 @@ def single_interation():
 #%%
 t0 = time.time()
 outputs = []
-for i in range(100):
+for i in range(1000):
     out = single_interation()
     outputs.append(out)
-    print(i, out[0]._infected_on, out[1]._infected_on)
+    print(i, out[0].infected_on, out[1].infected_on)
 t1 = time.time()
 print(t1 - t0)
 
@@ -71,7 +71,7 @@ print(t1 - t0)
 
 plt.clf()
 for i in [0, 1]:
-    h_inf = [h[i]._infected_on if h[i]._infected_on is not None else 101 for h in outputs]
+    h_inf = [h[i].infected_on if h[i].infected_on is not None else 101 for h in outputs]
     values, base = np.histogram(h_inf, bins = 40)
     cumulative = np.cumsum(values)
     cumulative = cumulative / cumulative[-1]

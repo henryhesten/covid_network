@@ -18,19 +18,20 @@ class Person:
     contagious_to_inc: Optional[int] = None
     days_to_contagious: Optional[int] = None  # relative to infection day
     contagious_duration: Optional[int] = None  # in days
-    _infected_on: Optional[int] = None
+    infected_on: Optional[int] = None
     symptoms_start: Optional[int] = None
     trustworthy_prb: float = 1
     _is_trustworthy: Optional[bool] = None  # do they warn people when they have symptoms
-    _knows_they_might_have_been_infected_on_day: Optional[int] = None  # even if they no longer have symptoms
+    _potential_infection_on_day: Optional[int] = None  # They know they may have been infected on or after this day even if they no longer have symptoms
+    _warned_of_infection_on: list[int] = field(default_factory = lambda: [])  # The day they learned that there was infection in the network they were at risk from
     
     def was_infected(self) -> bool:
-        return self._infected_on is not None
+        return self.infected_on is not None
     
     def is_infected_on_day(self, day: int) -> bool:
-        if self._infected_on is None:
+        if self.infected_on is None:
             return False
-        return self._infected_on <= day
+        return self.infected_on <= day
     
     def get_events_after_marcov(self, day: int) -> list[Event]:
         return [e for e in self.single_events if e.day.sample() == day and e.did_occur_after_marcov()]
@@ -49,7 +50,7 @@ class Person:
         return True
     
     def knows_they_might_have_been_infected(self, day: int) -> bool:
-        if self._knows_they_might_have_been_infected_on_day is not None and day >= self._knows_they_might_have_been_infected_on_day:
+        if self._potential_infection_on_day is not None and day >= self._potential_infection_on_day:
             return True
         return self.was_infected() and self.symptomatic and day > self.symptoms_start
     
@@ -58,15 +59,17 @@ class Person:
             self._is_trustworthy = marcov_binary(self.trustworthy_prb)
         return self._is_trustworthy
     
-    def warn_potential_infection_on(self, day: int) -> None:
-        if self._knows_they_might_have_been_infected_on_day is not None \
-                and self._knows_they_might_have_been_infected_on_day <= day:
+    def warn_potential_infection_on(self, potential_infection_day: int, warned_day: int) -> None:
+        self._warned_of_infection_on.append(warned_day)
+        
+        if self._potential_infection_on_day is not None \
+                and self._potential_infection_on_day <= potential_infection_day:
             return
         
-        self._knows_they_might_have_been_infected_on_day = day
+        self._potential_infection_on_day = potential_infection_day
         for inter in self.interactions:
-            if inter.day.sample() >= day:
-                inter.warn_participants_of_infection()
+            if inter.day.sample() >= potential_infection_day:
+                inter.warn_participants_of_infection(warned_day)
 
 
 def unique_people(people: list[Person]) -> bool:
@@ -74,13 +77,27 @@ def unique_people(people: list[Person]) -> bool:
     return len(ids) == len(set(ids))
 
 
-def describe_people(people: list[Person]):
+def describe_people(people: list[Person], detailed = False) -> str:
     out_str = ""
     for person in people:
-        if person.was_infected():
-            desc = person.infected_by.split(";")[0]
-            symp = "sympt" if person.symptomatic else "Asympt"
-            out_str += f"{person.id} {desc} {symp}.  "
-        else:
-            out_str += f"{person.id} no-infection.  "
+        out_str += describe_person(person, detailed) + ".  "
     return out_str
+
+
+def describe_person(person: Person, detailed = True) -> str:
+    if not person.was_infected():
+        return f"{person.id} no-infection"
+    
+    desc = person.id + " "
+    if detailed:
+        desc += person.infected_by
+    else:
+        desc += person.infected_by.split(";")[0]
+    desc += " Sympt" if person.symptomatic else " Asympt"
+    if detailed:
+        desc += f", infected: {person.infected_on}, "
+        desc += f"symptons_start: {person.symptoms_start}, "
+        desc += f"contagious_range: {person.contagious_from_inc}->{person.contagious_to_inc}, "
+        desc += f"potential_infection_after: {person._potential_infection_on_day}, "
+        desc += f"warned_on: {person._warned_of_infection_on}"
+    return desc

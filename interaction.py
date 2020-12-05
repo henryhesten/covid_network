@@ -62,6 +62,6 @@ class Interaction(AbstractEvent):
             self.__person_infected[ind] = infected
         return self.__person_infected[ind]
     
-    def warn_participants_of_infection(self) -> None:
+    def warn_participants_of_infection(self, warned_day: int) -> None:
         for person in self.people:
-            person.warn_potential_infection_on(self.day.sample())
+            person.warn_potential_infection_on(self.day.sample(), warned_day)

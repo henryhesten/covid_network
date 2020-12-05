@@ -30,6 +30,8 @@ class Config:
     
     _contagious_duration_array: np.array = np.array([7, 9, 11, 13, 15])
     
+    warn_interactions_days_before_symptoms = 15  # If you get symptoms warn anyone you interacted with 15 days before that
+    
     def __post_init__(self):
         self._contagious_duration_array = np.floor(self._contagious_duration_array * self.duration_pessimism_factor)
     

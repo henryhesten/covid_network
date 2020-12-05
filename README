@@ -1,0 +1,8 @@
+This is a model for simulating how covid will spread through a network of people
+
+It is a marcov simulation, this means that whenever the simulation could do one of multiple things it chooses one a random
+E.g. if there is a 1 in 6 change that a person is infected, it rolls a dice and infects them if it is a 1
+Therefore to get a good idea of what could happen you need to run multiple simulations
+In tests/simple.py you can see that there is a function single_interation(). This runs a *single* marcov trial
+This function is run 1000 times in the code below. In each of these 1000 simulations the people Harold and Sohpie are
+ infected at different times. These times are then plotted
