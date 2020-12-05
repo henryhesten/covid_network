@@ -78,7 +78,7 @@ outputs = []
 kath_base_prb = 0.1
 h_see_r = 30
 h_see_s = 36
-num_sims = 10**5
+num_sims = 10**6
 for i in range(num_sims):
     out = single_sim(kath_base_prb = kath_base_prb, h_see_s = h_see_s, h_see_r = h_see_r)
     print(100 * i / num_sims, [x._infected_on for x in out])
