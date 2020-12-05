@@ -100,9 +100,3 @@ assert len(sophie_infected) == len(sophie_infected)
 #%%
 descs = [describe_people(out) for out in outputs]
 uniq_c(descs)
-
-#%%
-for out in outputs:
-    sophie = out[0]
-    if sophie.was_infected():
-        break
