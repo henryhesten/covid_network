@@ -13,7 +13,7 @@ from covid_network.distributionDiscrete import DistributionDiscrete, const_distr
 from covid_network.event import Event
 from covid_network.infector import Infector
 from covid_network.interaction import Interaction
-from covid_network.person import Person
+from covid_network.person import Person, describe_people
 
 #%%
 '''
@@ -23,42 +23,44 @@ mpl.rcParams.update({"font.size":18, 'figure.figsize':[12,9]})
 #%%
 '''
 
-
 #%%
+config = Config()
+
 
 def single_interation():
-    henry: Person = Person("henry", DistributionBeta(True, 0.9, 1e-6))
-    stephani: Person = Person("stephani", DistributionBeta(True, 0.001, 0.005))
+    harold: Person = Person("harold", DistributionBeta(True, 0.9, 1e-6))
+    sophie: Person = Person("sophie", DistributionBeta(True, 0.001, 0.005))
     
     SHOPPING_INC = 3
     for d in range(100):
         event = Event(
                 DistributionDiscrete(True, np.arange(SHOPPING_INC) + d * SHOPPING_INC, [1 / SHOPPING_INC] * SHOPPING_INC),
                 0,
-                f"shopping {d}"
+                f"shopping {d}",
+                config = config
         )
-        henry.single_events.append(event)
+        harold.single_events.append(event)
     
     for d in range(300):
         Interaction(day = const_distribution(d),
                     prob_infection = 0.5,
-                    description = f"Stephani-Henry {d}",
+                    description = f"sophie-harold {d}",
                     probability_occurring = 0.2,
-                    people = [henry, stephani])
+                    people = [harold, sophie],
+                    config = config)
     
-    people = [henry, stephani]
+    people = [harold, sophie]
     
-    config: Config = Config()
     infector: Infector = Infector(config, people)
     infector.propagate(100)
     
-    return henry, stephani
+    return sophie, harold
 
 
 #%%
 t0 = time.time()
 outputs = []
-for i in range(10):
+for i in range(100):
     out = single_interation()
     outputs.append(out)
     print(i, out[0]._infected_on, out[1]._infected_on)
@@ -74,4 +76,3 @@ for i in [0, 1]:
     cumulative = np.cumsum(values)
     cumulative = cumulative / cumulative[-1]
     plt.plot(base[:-1], cumulative)
-#%%

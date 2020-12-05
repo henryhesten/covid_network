@@ -51,7 +51,7 @@ class Person:
     def knows_they_might_have_been_infected(self, day: int) -> bool:
         if self._knows_they_might_have_been_infected_on_day is not None and day >= self._knows_they_might_have_been_infected_on_day:
             return True
-        return self.symptomatic and day > self.symptoms_start
+        return self.was_infected() and self.symptomatic and day > self.symptoms_start
     
     def is_trustworthy(self) -> bool:
         if self._is_trustworthy is None:

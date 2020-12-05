@@ -32,44 +32,44 @@ config: Config = Config()
 
 
 def single_sim(h_see_r = 30, h_see_s = 39):
-    stephani: Person = Person("stephani", DistributionBeta(True, 1e-12, 1e-16))
-    henry: Person = Person("henry", DistributionBeta(True, SENSIBLE_RATE, SENSIBLE_RATE / 2))
-    rach: Person = Person("rach", DistributionBeta(True, SENSIBLE_RATE, SENSIBLE_RATE / 2))
-    jess: Person = Person("jess", DistributionBeta(True, SENSIBLE_RATE, SENSIBLE_RATE / 2))
-    kath: Person = Person("kath", DistributionBeta(True, DOC_RATE, DOC_RATE / 2))
+    sophie: Person = Person("sophie", DistributionBeta(True, 1e-12, 1e-16))
+    harold: Person = Person("harold", DistributionBeta(True, SENSIBLE_RATE, SENSIBLE_RATE / 2))
+    rose: Person = Person("rose", DistributionBeta(True, SENSIBLE_RATE, SENSIBLE_RATE / 2))
+    charlie: Person = Person("charlie", DistributionBeta(True, SENSIBLE_RATE, SENSIBLE_RATE / 2))
+    katie: Person = Person("katie", DistributionBeta(True, DOC_RATE, DOC_RATE / 2))
     
-    # Before Rach BDay
+    # Before rose BDay
     for d in range(h_see_r):
         Interaction(day = const_distribution(d),
                     prob_infection = HOUSEHOLD_RATE,
                     description = f"flat;{d}",
                     probability_occurring = 1,
-                    people = [rach, jess, kath],
+                    people = [rose, charlie, katie],
                     config = config)
     
-    # On Rach BDAY
+    # On rose BDAY
     Interaction(day = const_distribution(h_see_r),
                 prob_infection = HOUSEHOLD_RATE,
                 description = f"flat;{h_see_r}",
                 probability_occurring = 1,
-                people = [rach, jess, kath, henry],
+                people = [rose, charlie, katie, harold],
                 config = config)
     Interaction(day = const_distribution(h_see_r),
                 prob_infection = SEX_RATE,
                 description = f"sex-h-r",
                 probability_occurring = 1,
-                people = [rach, henry],
+                people = [rose, harold],
                 config = config)
     
-    # Henry see Stephani
+    # harold see sophie
     Interaction(day = const_distribution(h_see_s),
                 prob_infection = SEX_RATE,
                 description = f"sex-h-s",
                 probability_occurring = 1,
-                people = [stephani, henry],
+                people = [sophie, harold],
                 config = config)
     
-    people = [stephani, henry, rach, jess, kath]
+    people = [sophie, harold, rose, charlie, katie]
     
     infector: Infector = Infector(config, people)
     infector.propagate(h_see_s + 1)
@@ -86,7 +86,7 @@ def reported_symptoms_before(people, day):
 
 #%%
 outputs = []
-kath_base_prb = 0.1
+katie_base_prb = 0.1
 h_see_r = 50
 h_see_s = 56
 num_sims = 10**5
@@ -101,12 +101,12 @@ print(f"h_see_s = {h_see_s}")
 no_symptoms_reported = [x for x in outputs if not reported_symptoms_before(x, h_see_s)]
 print(f"Finished {len(outputs)}, {len(no_symptoms_reported)} reported no symptoms")
 
-stephani_infected = [x for x in no_symptoms_reported if x[0].was_infected()]
-s_risk = len(stephani_infected) / len(no_symptoms_reported)
-print(f"Of these cases, Stephani infected {len(stephani_infected)} times: {100 * s_risk}%")
+sophie_infected = [x for x in no_symptoms_reported if x[0].was_infected()]
+s_risk = len(sophie_infected) / len(no_symptoms_reported)
+print(f"Of these cases, sophie infected {len(sophie_infected)} times: {100 * s_risk}%")
 
-stephani_infected_check = [x for x in outputs if x[0].was_infected()]
-assert len(stephani_infected) == len(stephani_infected)
+sophie_infected_check = [x for x in outputs if x[0].was_infected()]
+assert len(sophie_infected) == len(sophie_infected)
 
 #%%
 descs = [describe_people(out) for out in outputs]
