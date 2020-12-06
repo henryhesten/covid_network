@@ -19,7 +19,7 @@ SEX_RATE = 1
 DOCTOR_SCALING = 11  # https://www.thelancet.com/journals/lanpub/article/PIIS2468-2667(20)30164-X/fulltext
 
 BASE_RATE_DAILY_GOV = 15000 / 66e6
-GOV_UNDERESTIMATE = 3.02
+GOV_UNDERESTIMATE = 3.02  # Based on a comparison to an independant study from King's College around September
 BASE_RATE_DAILY = BASE_RATE_DAILY_GOV * GOV_UNDERESTIMATE
 
 # /10 seams reasonable, also matches going to the shop each day

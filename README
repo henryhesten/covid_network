@@ -1,6 +1,7 @@
 ### INTRODUCTION ###
 This is a model for simulating how covid will spread through a network of people.
 You will need basic python knowledge to use this model
+You will also need to provide some of the probabilities. Look here: https://www.microcovid.org
 
 It is a marcov simulation, this means that whenever the simulation could do one of multiple things it chooses one a random
 E.g. if there is a 1 in 6 change that a person is infected, it rolls a dice and infects them if it is a 1
