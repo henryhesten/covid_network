@@ -68,8 +68,9 @@ def single_sim(katie_base_prb = 0.1, h_see_r = 30, h_see_s = 39):
 
 def reported_symptoms_before(people, day):
     for person in people:
-        if person.knows_they_might_have_been_infected(day):
-            return True
+        for warn_day in person._warned_of_infection_on:
+            if warn_day < day:
+                return True
     return False
 
 
@@ -78,7 +79,7 @@ outputs = []
 katie_base_prb = 0.1
 h_see_r = 30
 h_see_s = 36
-num_sims = 10**5
+num_sims = 10**6
 for i in range(num_sims):
     out = single_sim(katie_base_prb = katie_base_prb, h_see_s = h_see_s, h_see_r = h_see_r)
     print(100 * i / num_sims, [x.infected_on for x in out])
@@ -97,11 +98,9 @@ print(f"Of these cases, sophie infected {len(sophie_infected)} times: {100 * s_r
 sophie_infected_check = [x for x in outputs if x[0].was_infected()]
 assert len(sophie_infected) == len(sophie_infected_check)
 
+katie_infected = [x for x in outputs if x[-1].was_infected()]
+k_risk = len(katie_infected) / len(outputs)
+print(f"Out of all cases, katie was infected {100 * k_risk}%")
 #%%
 descs = [describe_people(out) for out in outputs]
 uniq_c(descs)
-#%%
-descs = [describe_people(out) for out in no_symptoms_reported]
-uniq_c(descs)
-
-#%%

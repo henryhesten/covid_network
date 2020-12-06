@@ -1,8 +1,79 @@
-This is a model for simulating how covid will spread through a network of people
+### INTRODUCTION ###
+This is a model for simulating how covid will spread through a network of people.
+You will need basic python knowledge to use this model
 
 It is a marcov simulation, this means that whenever the simulation could do one of multiple things it chooses one a random
 E.g. if there is a 1 in 6 change that a person is infected, it rolls a dice and infects them if it is a 1
 Therefore to get a good idea of what could happen you need to run multiple simulations
 In tests/simple.py you can see that there is a function single_interation(). This runs a *single* marcov trial
-This function is run 1000 times in the code below. In each of these 1000 simulations the people Harold and Sohpie are
+This function is run 1000 times in the code below. In each of these 1000 simulations the people Harold and Sophie are
  infected at different times. These times are then plotted
+
+These are the rules for how people are infected:
+1. Each person has a background probability of infection each day, from sources NOT covered in the rest of the simulation
+2. Each person has a list of specific significant events which can infect them. E.g. going to a restaurant.
+   Each of these events has a probability of infecting them
+3. Each person may be infected by another person in the network via an "interaction"
+
+When a person gets symptoms they warn the other people in the network that they have been in contact with in the previous 15 days
+These people in the network then warn anyone they were in contact with after that point, and so on
+It is assumed that anyone who has symptoms, or has been warned of potential infections will NOT interact further
+People can be labeled as "untrustworthy" in which case they still see people when they have symptoms
+
+Once infected the person has a 57.5% chance of developing symptoms.
+The time between infection and symptoms is log-normally distributed
+The person becomes infectious a random time before or after developing symptoms (or when they would have developed symptoms if they are asymptomatic)
+The infected person has a constant (over time) level of infectiousness for a random period after becoming infectious
+The probabilities of spreading infection defined in the model are for symptomatic people, in asymptomatic people this is reduced to 10% (i.e. by 90%)
+
+The main danger from your friends is transmission before symptoms, or from asymptomatic people
+This is because you should not see your friends when they have symptoms
+The probability of dying is not simulated, because long covid is highly likely, bad and should be avoided
+
+It is best used to answer a specific question e.g.
+Given that I saw Rosi on Wednesday, and she lives with a doctor and another flatmate. If I see Sophie on Sunday what is
+the chance of me infecting her?
+To run many simulations until Sophie has been infected at least 25 times. The error in most outputs of this model is
+equal to the square root of the number of events. This means that Sophie has actually been infected between 15 and 35
+times (for 2 standard deviations). Then count the total number of applicable simulations
+Which simulations are applicable is not trivial. For example, on Sunday morning you will know for that noone in your network
+has reported symptoms. You should therefore remove all simulations where someone reported symptoms from the total number
+of simulations. What you are left with after this is the set of simulations that actually could happen (or actually are happening)
+
+The file test/test_certain_kath simulates what happens if katie is almost certain to catch covid before Harold sees her
+This simulation was created because it is easier to see what is going on with larger infection rates.
+Large numbers of simulations where no-one is infected are not useful
+
+test/test_reasonable is the same as above by with more realistic base rates of infection
+
+### INSTUCTIONS ###
+I don't actually know the "proper" way to run python scripts. I run mine in pycharm.
+All imports start with covid_network... so manage that however you usually do
+
+1. Define each person, giving them a base rate of infection, based on their usual daily activities
+2. Pick a starting day for the simulation, this should be approximately a month before anything interesting happens, see below
+3. Define the events that happen to each person
+   The days that the events happen on can be random, e.g. Wednesday OR Thursday
+   The event can have a probability of occurring if it might not happen
+4. Define the interactions between all people in the network. Interactions can involve multiple people
+5. Create a Config object. If you want to change high level any simulation parameters, look here
+6. Create an Infector object, this will do most of the simulation
+7. Propagate the infector for a set number of days
+8. The people objects will now have been updated with information about what happened
+9. Read person.was_infected(), person.infected_on(), or which ever variable you are interested in
+
+10. Once the above works for a *single* simulation put it in a function
+11. Run that funciton a lot of times and record the outputs
+12. Create a statistical summary of all those outputs
+13. If you want to study how the statistical summary varies when you change the initial conditions, then put this block
+    in a funciton as well
+
+14. Make sure your answers are reasonable. E.g. if a person was never infected then you probably did something wrong,
+    or need to increase the number of simulations
+15. Share this with your friends, so they can also not die
+
+Tips:
+Start with small numbers of simulations until you know there are no bugs, they can take time to run
+Be careful on what day you start the simulation. If you start too early with a high infection rate you may infect
+the intial person (katie) too early, and they will have passed the contagious / presymptomatic phase before
+the rest of your interactions happen

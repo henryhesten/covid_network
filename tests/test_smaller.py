@@ -59,16 +59,16 @@ def reported_symptoms_before(people, day):
 
 #%%
 outputs = []
-katie_base_prb = 0.1
+rose_base_prb = 0.1
 h_see_r = 30
 h_see_s = 36
 num_sims = 10**5
 for i in range(num_sims):
-    out = single_sim(rose_base_prb = katie_base_prb, h_see_s = h_see_s, h_see_r = h_see_r)
+    out = single_sim(rose_base_prb = rose_base_prb, h_see_s = h_see_s, h_see_r = h_see_r)
     print(100 * i / num_sims, [x.infected_on for x in out])
     outputs.append(out)
 
-print(f"katie_base_prb = {katie_base_prb}")
+print(f"katie_base_prb = {rose_base_prb}")
 print(f"h_see_r = {h_see_r}")
 print(f"h_see_s = {h_see_s}")
 no_symptoms_reported = [x for x in outputs if not reported_symptoms_before(x, h_see_s - 1)]
@@ -84,23 +84,3 @@ assert len(sophie_infected) == len(sophie_infected_check)
 #%%
 descs = [describe_people(out) for out in outputs]
 uniq_c(descs)
-#%%
-descs = [describe_people(out) for out in no_symptoms_reported]
-uniq_c(descs)
-#%%
-for out in outputs:
-    if describe_people(out) == 'sophie interaction:sex-h-s Sympt.  harold interaction:sex-h-r Asympt.  rose base:0 Asympt.  ':
-        if reported_symptoms_before(out, h_see_s):
-            print("found")
-            break
-
-for person in out:
-    print(describe_person(person))
-
-#%%
-inter = out[0].interactions[0]
-pa = out[1]
-pb = out[0]
-inter._Interaction__a_infected_b_after_marcov(pa, pb)
-pa.practically_contagious(36)
-#%%
